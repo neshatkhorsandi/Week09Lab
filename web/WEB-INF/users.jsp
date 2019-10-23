@@ -75,6 +75,7 @@
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Role</th>
+                            <th>Items</th>
                             <th class="text-center">Edit</th>
                             <th class="text-center">Delete</th>
                         </tr>
@@ -86,15 +87,27 @@
                                 <td>${user.fname}</td>
                                 <td>${user.lname}</td>
                                 <td>${user.role.roleName}</td>
+                                <td>
+                                    <c:forEach items="${user.itemList}" var="item">
+                                        ${item.itemName} (${item.category.categoryName}) <br>
+                                    </c:forEach>
+                                </td>
                                 <td class="text-center">
-                                    <a href="/users?action=edit&email=${user.email}" 
+                                    <a href="<c:url value='/users'>
+                                       <c:param name='action' value='edit'/>
+                                       <c:param name='email' value='${user.email}'/>
+                                    </c:url>"
                                        class="row-btn">
                                         <i class="text-secondary fas fa-pencil-alt"></i>
                                     </a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/users?action=delete&email=${user.email}" 
-                                       <i class="text-danger fas fa-times"></i>
+                                  <a href="<c:url value='/users'>
+                                       <c:param name='action' value='delete'/>
+                                       <c:param name='email' value='${user.email}'/>
+                                    </c:url>"
+                                       class="row-btn">
+                                        <i class="text-danger fas fa-times"></i>
                                     </a>
                                 </td>
                             </tr>

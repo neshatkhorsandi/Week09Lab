@@ -9,179 +9,89 @@ import models.User;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import models.Role;
+import utilities.DBUtil;
 
 public class UserDB {
 
     public void insert(User user) throws Exception {
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = connectionPool.getConnection();
-        int rows = 0;
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
         try {
-            String preparedQuery
-                    = "INSERT INTO User_Table "
-                    + "(email, fname, lname, password, role) "
-                    + "VALUES "
-                    + "(?, ?, ?, ?, ?)";
-
-            PreparedStatement ps = connection.prepareStatement(preparedQuery);
-
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getFname());
-            ps.setString(3, user.getLname());
-            ps.setString(4, user.getPassword());
-            ps.setInt(5, user.getRole().getRoleID());
-
-            rows = ps.executeUpdate();
-            ps.close();
-
-        }  finally {
-            connectionPool.freeConnection(connection);
+            Role role = user.getRole();
+            role.getUserList().add(user);
+            
+            trans.begin();
+            em.persist(user);
+            trans.commit();
+        } catch (Exception e) {
+            trans.rollback();
+        } finally {
+            em.close();
         }
     }
 
     public void update(User user) throws Exception {
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = connectionPool.getConnection();
-        String UPDATE_STATEMENT = "UPDATE User_Table set active=?, fname=?, lname=?, role=? where email=?";
-        int successCount = 0;
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
         try {
-            PreparedStatement statement = connection.prepareStatement(UPDATE_STATEMENT);
-            statement.setBoolean(1, user.isActive());
-            statement.setString(2, user.getFname());
-            statement.setString(3, user.getLname());
-            statement.setInt(4, user.getRole().getRoleID());
-            statement.setString(5, user.getEmail());
-            
-
-            successCount = statement.executeUpdate();
-            statement.close();
-
+            trans.begin();
+            em.merge(user);
+            trans.commit();
+        } catch (Exception e) {
+            trans.rollback();
         } finally {
-            connectionPool.freeConnection(connection);
+            em.close();
         }
     }
 
     public List<User> getAll() throws Exception {
-        ConnectionPool connectionPool = null;
-        Connection connection = null;
-
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
         try {
-            connectionPool = ConnectionPool.getInstance();
-            connection = connectionPool.getConnection();
-            User user;
-            ArrayList<User> users = new ArrayList<>();
-
-            String preparedSQL = "SELECT active, email, fname, lname, role FROM user_table";
-            PreparedStatement ps = connection.prepareStatement(preparedSQL);
-            ResultSet product = ps.executeQuery();
-
-            while (product.next()) {
-                boolean active = product.getBoolean(1);
-                String userEmail = product.getString(2);
-                String fname = product.getString(3);
-                String lname = product.getString(4);
-
-                int roleID = product.getInt(5);
-                RoleDB roleDB = new RoleDB();
-                Role role = roleDB.getRole(roleID);
-
-                user = new User(userEmail, fname, lname, null, role);
-
-                user.setActive(active);
-                users.add(user);
-            }
+            List<User> users = em.createNamedQuery("User.findAll", User.class).getResultList();
             return users;
         } finally {
-            connectionPool.freeConnection(connection);
+            em.close();
         }
-
     }
     
     public List<User> getAllActive() throws Exception {
-        ConnectionPool connectionPool = null;
-        Connection connection = null;
-
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
         try {
-            connectionPool = ConnectionPool.getInstance();
-            connection = connectionPool.getConnection();
-            User user;
-            ArrayList<User> users = new ArrayList<>();
-
-            String preparedSQL = "SELECT active, email, fname, lname, role FROM user_table where active=true";
-            PreparedStatement ps = connection.prepareStatement(preparedSQL);
-            ResultSet product = ps.executeQuery();
-
-            while (product.next()) {
-                boolean active = product.getBoolean(1);
-                String userEmail = product.getString(2);
-                String fname = product.getString(3);
-                String lname = product.getString(4);
-
-                int roleID = product.getInt(5);
-                RoleDB roleDB = new RoleDB();
-                Role role = roleDB.getRole(roleID);
-
-                user = new User(userEmail, fname, lname, null, role);
-
-                user.setActive(active);
-                users.add(user);
-            }
+            List<User> users = em.createNamedQuery("User.findByActive", User.class)
+                    .setParameter("active", true).getResultList();
             return users;
         } finally {
-            connectionPool.freeConnection(connection);
+            em.close();
         }
     }
 
     public User getUser(String email) throws Exception {
-
-        ConnectionPool connectionPool = null;
-        Connection connection = null;
-
-        try {
-            connectionPool = ConnectionPool.getInstance();
-            connection = connectionPool.getConnection();
-
-            User user = new User();
-            String preparedSQL = "SELECT active, email, fname, lname, password, role FROM user_table WHERE email = ?";
-            PreparedStatement ps = connection.prepareStatement(preparedSQL);
-            ps.setString(1, email);
-            ResultSet product = ps.executeQuery();
-
-            while (product.next()) {
-                boolean active = product.getBoolean(1);
-                String userEmail = product.getString(2);
-                String fname = product.getString(3);
-                String lname = product.getString(4);
-                String password = product.getString(5);
-                int roleID = product.getInt(6);
-                RoleDB roleDB = new RoleDB();
-                Role role = roleDB.getRole(roleID);
-
-                user = new User(userEmail, fname, lname, password, role);
-                user.setActive(active);
-
-            }
-            return user;
-        } finally {
-            connectionPool.freeConnection(connection);
-        }
-
+         EntityManager em = DBUtil.getEmFactory().createEntityManager();
+         try {
+             User user = em.find(User.class, email);
+             return user;
+         } finally {
+             em.close();
+         }
     }
 
     public void delete(User user) throws Exception {
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = connectionPool.getConnection();
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
         try {
-            String DELETE_STMT = "DELETE FROM User_Table where email = ?";
-            PreparedStatement prepare = connection.prepareStatement(DELETE_STMT);
-            prepare.setString(1, user.getEmail());
-
-            int rowCount = prepare.executeUpdate();
-            prepare.close();
-
+            Role role = user.getRole();
+            role.getUserList().remove(user);
+            
+            trans.begin();
+            em.remove(em.merge(user));
+            trans.commit();
+        } catch (Exception e) {
+            trans.rollback();
         } finally {
-            connectionPool.freeConnection(connection);
+            em.close();
         }
     }
 
