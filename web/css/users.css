@@ -1,0 +1,102 @@
+body {
+  max-height: 100vh;
+  background: #232931;
+}
+.page{
+  display: grid;
+  color: #eeeeee;
+  grid-template-rows: 3.5rem auto;
+  grid-template-columns: 20% auto 20%;
+  grid-column-gap: 2rem;
+  grid-row-gap: 2rem;
+  grid-template-areas:
+    "header header header"
+    "useradd main useredit"
+}
+.navbar {
+  grid-area: header;
+}
+.main {
+  grid-area: main;
+}
+
+.user-table {
+  max-height: 85vh !important;
+  overflow-y: auto;
+  margin: 5px 15px 5px;
+}
+
+.row-btn {
+  padding: 0;
+  min-width: 35px;
+}
+.user-add-form {
+  grid-area: useradd;
+  margin-left: 15px;
+}
+
+.user-edit-form {
+  grid-area: useredit;
+  margin-right: 15px;
+}
+
+.user-edit-form form {
+  padding: 5px;
+  border: 2px solid #4ecca3;
+}
+
+.input-dark {
+  color: #eeeeee;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+  background: #232931;
+  border: 1px solid #393e46;
+}
+
+.input-primary {
+  padding: 5px;
+  margin-bottom: 5px;
+  width: 100%;
+  background: #4ecca3;
+  color: #232931;
+  border: 1px solid #393e46;
+}
+
+.input-danger {
+  padding: 5px;
+  width: 100%;
+  margin-bottom: 5px;
+  background: #dc3545;
+  color: #eeeeee;
+  border: 1px solid #393e46;
+}
+
+.input-secondary {
+  padding: 5px;
+  width: 100%;
+  margin-bottom: 5px;
+  background: #aaaaaa;
+  color: #111;
+  border: 1px solid #393e46;
+}
+
+.error-message {
+  padding: 10px;
+  border-radius: 5px;
+  background: #dc3545;
+  position: fixed;
+  width: 200px;
+  left: calc(50vw - 100px);
+  bottom: 10px;
+  color: #eee;
+}
+
+::-webkit-scrollbar {
+  width: 5px;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+  background: #4ecca3;
+}
