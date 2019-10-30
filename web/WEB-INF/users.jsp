@@ -26,7 +26,10 @@
                 <a class="navbar-brand" href="/">Inventory Management</a>
 
                 <ul class="navbar-nav ml-auto">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="home">Home</a>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <a class="nav-link" href="login">Logout</a>
                 </ul>
             </nav>
 
