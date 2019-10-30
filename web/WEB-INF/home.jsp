@@ -14,5 +14,8 @@
     <body>
         <h1>Home</h1>
         <h2>Hi ${email}</h2>
+        <div>
+            <a href="login">Logout</a>
+        </div>
     </body>
 </html>
