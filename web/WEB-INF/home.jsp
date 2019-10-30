@@ -11,7 +11,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Home Page</title>
     </head>
-    <body>
+    <body> 
         <h1>Home</h1>
         <h2>Hi ${email}</h2>
         <div>
